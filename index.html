@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Encuesta Le Tulipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#fbf1f2; --surface:#fff; --ink:#3b2420; --muted:#7d6460; --rose:#c9496b; --rose-soft:#f6d7df;
+  --gold:#b8892f; --line:#ead6d8; --bad:#b03a3a; --logo-bg:transparent;
+  --display:"Gloock",Georgia,serif; --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#1f1513; --surface:#2a1d1a; --ink:#f5e6e3; --muted:#c3a9a4; --rose:#ee7e9b; --rose-soft:#4a2630;
+  --gold:#e0b45a; --line:#43302c; --bad:#ec7a7a; --logo-bg:#fbf1f2; color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+.wrap{max-width:640px;margin:0 auto;padding-block:28px 64px;display:flex;flex-direction:column;gap:20px}
+
+/* Encabezado */
+header{display:flex;flex-direction:column;gap:8px}
+.logo-wrap{align-self:flex-start;padding:8px;border-radius:16px;background:var(--logo-bg)}
+.logo{display:block;width:76px;height:auto}
+h1{font:400 clamp(28px,7vw,40px)/1.1 var(--display);margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:52ch}
+
+/* Progreso */
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;
+  display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.bar{flex:1;height:6px;background:var(--rose-soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--rose);transition:width .3s}
+
+/* Tarjeta de paso: preguntas separadas por línea, como una encuesta */
+form{display:flex;flex-direction:column;gap:20px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 20px 20px;animation:in .3s ease both}
+.step.back{animation-name:inback}
+@keyframes in{from{opacity:.001;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes inback{from{opacity:.001;transform:translateX(-16px)}to{opacity:1;transform:none}}
+.step h2{font:400 22px var(--display);margin:14px 0 4px}
+.note{margin:0 0 4px;font-size:13px;color:var(--muted)}
+.q{border:0;border-top:1px solid var(--line);margin:0;padding:18px 0 4px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.q:first-of-type{border-top:0}
+.q legend{float:left;width:100%;padding:0;font-weight:600}
+.q legend+*{clear:both}
+.n{color:var(--rose);font-family:var(--display);margin-right:6px}
+.req{color:var(--rose)}
+.hint{font-weight:400;font-size:13px;color:var(--muted)}
+
+/* Controles */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input,.tulip input,.nps input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;padding:8px 14px;border:1px solid var(--line);border-radius:999px;font-size:14px;background:var(--bg);transition:background .15s}
+.chip input:checked+span{background:var(--rose);border-color:var(--rose);color:#fff}
+.tulips{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.tulip{position:relative;width:44px;height:44px}
+.tulip svg{width:100%;height:100%;display:block}
+.petal{fill:var(--rose-soft);stroke:var(--rose);stroke-width:1.4;transition:fill .15s}
+.stem{stroke:var(--gold);stroke-width:2;fill:none}
+.tulip.on .petal{fill:var(--rose)}
+.val{font-size:13px;color:var(--muted);margin-left:8px}
+.nps{display:grid;grid-template-columns:repeat(11,1fr);gap:4px}
+.nps label{position:relative}
+.nps span{display:flex;align-items:center;justify-content:center;height:40px;border:1px solid var(--line);border-radius:8px;font-weight:600;font-size:14px;background:var(--bg)}
+.nps input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+textarea,input[type=text],input[type=month],select{width:100%;font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:90px;resize:vertical}
+select{appearance:none;cursor:pointer;padding-right:40px;
+  background-image:linear-gradient(45deg,transparent 50%,var(--rose) 50%),linear-gradient(135deg,var(--rose) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+:is(.chip,.tulip,.nps label) input:focus-visible+*,.tulip input:focus-visible~svg{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+:is(textarea,input,select):focus-visible{outline:2px solid var(--rose);outline-offset:1px}
+.check{display:flex;gap:10px;align-items:flex-start}
+.check input{width:22px;height:22px;margin-top:2px;accent-color:var(--rose)}
+.link{align-self:flex-start;background:none;border:0;padding:4px 0;font:14px var(--body);color:var(--gold);text-decoration:underline;cursor:pointer}
+.legal{margin:0;font-size:13px;line-height:1.6;color:var(--muted)}
+.hp{position:absolute;left:-9999px}
+
+/* Navegación */
+.nav{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.btn{border:0;border-radius:12px;padding:14px 20px;font:700 16px var(--body);cursor:pointer;background:var(--rose);color:#fff}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.alt[hidden]+.btn{grid-column:1/-1}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.msg{min-height:1.4em;margin:0;font-size:14px;color:var(--bad)}
+.contact{font-size:13px;color:var(--muted);text-align:center;margin:0}
+.thanks{text-align:center;padding:28px 20px}
+.thanks p{margin:0 auto;max-width:44ch;color:var(--muted)}
+@media (max-width:460px){.nps{grid-template-columns:repeat(6,1fr)}.tulip{width:40px;height:40px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo-wrap"><img class="logo" src="logo-le-tulipe.png" alt="Pastelería Le Tulipe" width="99" height="120" onerror="this.parentNode.hidden=true"></div>
+    <h1>¿Cómo estuvo tu mesa de postres?</h1>
+    <p class="lede">Tu opinión nos ayuda a que cada evento salga mejor que el anterior. Son 2 minutos.</p>
+  </header>
+
+  <div class="progress" id="progress"><div class="bar"><i id="pbar"></i></div><span id="ptext"></span></div>
+
+  <form id="f" novalidate>
+    <input class="hp" type="text" name="web" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div id="steps"></div>
+    <p class="msg" id="msg" role="alert"></p>
+    <div class="nav">
+      <button class="btn alt" type="button" id="back">Atrás</button>
+      <button class="btn" type="submit" id="next">Siguiente</button>
+    </div>
+    <p class="contact">¿Prefieres hablar con nosotros? WhatsApp <b>55 1003 0534</b></p>
+  </form>
+
+  <section class="step thanks" id="thanks" hidden>
+    <h2>¡Gracias!</h2>
+    <p>Gracias por dejarnos ser parte de tu celebración.</p>
+  </section>
+</div>
+
+<script>
+/* ===== 1. Configuración ===== */
+const CFG={
+  url:"https://script.google.com/macros/s/AKfycbySrtoSX6BaxDoB2ImJovS25-fSymg4W0sDD1rkR5ZVwA1_hFpi5AC0G_SEZodvGpBI/exec",   // URL de la app web de Apps Script
+  aviso:"2026-10"                                                          // versión del aviso de privacidad aceptado
+};
+
+/* ===== 2. Contenido de la encuesta (edita aquí, no en el HTML) ===== */
+const ETIQ=["","Muy malo","Malo","Regular","Bueno","Excelente"];
+const ASPECTOS=[
+  ["general","Experiencia general"],["sabor","Sabor de los postres"],
+  ["presentacion","Presentación y montaje de la mesa"],["frescura","Frescura de los postres"],
+  ["puntualidad","Puntualidad en la entrega y montaje"],["atencion","Atención y comunicación antes del evento"],
+  ["precio","Relación calidad-precio"]
+];
+const STEPS=[
+  {title:"Tu evento",qs:[
+    {k:"evento",type:"chips",req:1,l:"¿Qué celebraste con nosotros?",
+     opts:["XV años","Boda","Graduación","Evento corporativo","Salón o jardín","Bautizo / Primera comunión","Cumpleaños","Otro"]},
+    {k:"fecha",type:"month",l:"¿Cuándo fue tu evento?",hint:"mes y año"}]},
+  {title:"Califica tu experiencia",note:"1 tulipán = muy malo · 5 tulipanes = excelente",auto:1,
+   qs:ASPECTOS.map(([k,l])=>({k,type:"stars",req:1,l}))},
+  {title:"Recomendación",auto:1,qs:[
+    {k:"nps",type:"nps",req:1,l:"Del 0 al 10, ¿qué tan probable es que recomiendes Le Tulipe a un familiar o amigo?"},
+    {k:"volveria",type:"chips",req:1,l:"¿Nos volverías a contratar para otro evento?",opts:["Sí, seguro","Tal vez","No"]}]},
+  {title:"Cuéntanos más",qs:[
+    {k:"favorito",type:"select",l:"¿Cuál fue tu postre favorito?",ph:"Selecciona un postre",
+     opts:["Bavaresa 3 chocolates","Bavaresa frambuesas","Cheesecake","Choux","Cisnes","Éclair","Gelatina","Mini bomba de chocolate","Mini tarta de crema de limón","Mousse de choco capuchino","Mousse de chocolate","Mousse de coco","Mousse de limón","Mousse de rompope","Ópera","Soufflé heredia","Strudel","Tarta frutas tropicales","Timbal de fresa","Otro"]},
+    {k:"comentario",type:"text",l:"¿Te gustaría compartirnos algún comentario?",hint:"opcional",ph:"Lo que quieras contarnos sobre tu experiencia"},
+    {k:"canales",type:"multi",l:"¿Cómo nos conociste?",
+     opts:["Instagram","Facebook","TikTok","Recomendación","Expo","Mi salón o jardín","Google","Otro"]}]},
+  {title:"Último paso",qs:[{k:"acepto",type:"consent",req:1}]}
+];
+
+/* ===== 3. Render: un tipo de pregunta = una función ===== */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TULIP=`<svg viewBox="0 0 44 44" aria-hidden="true"><path class="stem" d="M22 26v14M22 34c-4-1-6-4-6-6M22 36c4-1 6-4 6-6"/><path class="petal" d="M13 10c0 9 3 16 9 16s9-7 9-16l-5 5-4-8-4 8z"/></svg>`;
+const chip=(k,o,type)=>`<label class="chip"><input type="${type}" name="${k}" value="${esc(o)}"><span>${esc(o)}</span></label>`;
+const INPUT={
+  chips:q=>`<div class="chips">${q.opts.map(o=>chip(q.k,o,"radio")).join("")}</div>`,
+  multi:q=>`<div class="chips">${q.opts.map(o=>chip(q.k,o,"checkbox")).join("")}</div>`,
+  month:q=>`<input type="month" name="${q.k}" aria-label="${esc(q.l)}">`,
+  text:q=>`<textarea name="${q.k}" maxlength="1200" placeholder="${esc(q.ph)}" aria-label="${esc(q.l)}"></textarea>`,
+  select:q=>`<select name="${q.k}" aria-label="${esc(q.l)}"><option value="">${q.ph}</option>${q.opts.map(o=>`<option>${esc(o)}</option>`).join("")}</select>
+    <input type="text" name="${q.k}_otro" maxlength="120" placeholder="Escribe cuál" aria-label="Otro postre favorito" hidden>`,
+  stars:q=>`<div class="tulips">${[1,2,3,4,5].map(v=>`<label class="tulip" title="${ETIQ[v]}"><input type="radio" name="${q.k}" value="${v}" aria-label="${v} – ${ETIQ[v]}">${TULIP}</label>`).join("")}<span class="val"></span></div>`,
+  nps:q=>`<div class="nps">${[...Array(11).keys()].map(n=>`<label><input type="radio" name="${q.k}" value="${n}" aria-label="${n}"><span>${n}</span></label>`).join("")}</div>
+    <div class="ends"><span>Nada probable</span><span>Muy probable</span></div>`,
+  consent:()=>`<label class="check"><input type="checkbox" name="acepto"><span>Acepto que Le Tulipe utilice mis respuestas para conocer mi opinión y mejorar su servicio.</span></label>
+    <button type="button" class="link" id="aviso-btn" aria-expanded="false" aria-controls="aviso-txt">Aviso de privacidad</button>
+    <p class="legal" id="aviso-txt" hidden>Pastelería Le Tulipe usará tus respuestas únicamente para conocer tu opinión y mejorar sus productos y servicio. No compartimos tus datos con terceros ni los usamos para otros fines. Puedes pedir que los consultemos, corrijamos o eliminemos escribiéndonos por WhatsApp al 55 1003 0534.</p>`
+};
+let n=0;
+const question=q=>q.type==="consent"?`<div class="q">${INPUT.consent()}</div>`:
+  `<fieldset class="q"><legend><span class="n">${++n}.</span>${esc(q.l)}${q.req?' <span class="req">*</span>':""}${q.hint?` <span class="hint">(${q.hint})</span>`:""}</legend>${INPUT[q.type](q)}</fieldset>`;
+$("steps").innerHTML=STEPS.map(s=>`<section class="step" hidden><h2>${s.title}</h2>${s.note?`<p class="note">${s.note}</p>`:""}${s.qs.map(question).join("")}</section>`).join("");
+
+/* ===== 4. Estado y navegación ===== */
+const form=$("f"), els=[...document.querySelectorAll(".step[hidden]")];
+const data=()=>new FormData(form);
+const stepOk=i=>STEPS[i].qs.filter(q=>q.req).every(q=>data().get(q.k));
+let cur=0, auto=new Set();
+
+function show(i,dir=1){
+  cur=Math.max(0,Math.min(STEPS.length-1,i));
+  els.forEach((el,j)=>{el.hidden=j!==cur;el.classList.toggle("back",dir<0)});
+  const last=cur===STEPS.length-1;
+  $("back").hidden=!cur;
+  $("next").textContent=last?"Enviar encuesta":"Siguiente";
+  $("next").disabled=!stepOk(cur);
+  $("pbar").style.width=(cur+1)/STEPS.length*100+"%";
+  $("ptext").textContent=`Paso ${cur+1} de ${STEPS.length}`;
+  $("msg").textContent="";
+  scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
+}
+
+form.addEventListener("change",e=>{
+  document.querySelectorAll(".tulips").forEach(t=>{
+    const v=+(t.querySelector("input:checked")?.value||0);
+    t.querySelectorAll(".tulip").forEach((l,i)=>l.classList.toggle("on",i<v));
+    t.querySelector(".val").textContent=ETIQ[v];
+  });
+  const otro=form.elements.favorito_otro, esOtro=form.elements.favorito.value==="Otro";
+  otro.hidden=!esOtro; if(!esOtro)otro.value="";
+  $("next").disabled=!stepOk(cur);
+  if(STEPS[cur].auto&&stepOk(cur)&&!auto.has(cur)&&e.target.type==="radio"){   // avanza solo al terminar el paso
+    auto.add(cur);const at=cur;setTimeout(()=>cur===at&&show(cur+1),550);
+  }
+});
+$("back").addEventListener("click",()=>show(cur-1,-1));
+form.addEventListener("click",e=>{
+  if(e.target.id!=="aviso-btn")return;
+  const t=$("aviso-txt");t.hidden=!t.hidden;e.target.setAttribute("aria-expanded",!t.hidden);
+});
+
+/* ===== 5. Envío a Google Sheets (Apps Script) ===== */
+function buildRow(){
+  const d=data(), v=k=>(d.get(k)||"").trim()||null;
+  const row={
+    evento:d.get("evento"), fecha_evento:d.get("fecha")?d.get("fecha")+"-01":null,
+    nps:+d.get("nps"), volveria:d.get("volveria"),
+    favorito:v("favorito"), favorito_otro:v("favorito_otro"), comentario:v("comentario"),
+    canales:d.getAll("canales"), aviso_version:CFG.aviso
+  };
+  ASPECTOS.forEach(([k])=>row[k]=+d.get(k));
+  return row;
+}
+async function send(row){
+  // Apps Script no responde con CORS: "no-cors" + text/plain evita el preflight. La respuesta es opaca,
+  // así que aquí solo se detectan fallos de red; confirma los envíos revisando la hoja.
+  await fetch(CFG.url,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(row)});
+}
+
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!stepOk(cur))return;
+  if(cur<STEPS.length-1)return show(cur+1);
+  const btn=$("next");btn.disabled=true;btn.textContent="Enviando…";
+  try{
+    if(!data().get("web"))await send(buildRow());          // si "web" trae texto es un bot: se descarta en silencio
+    form.hidden=$("progress").hidden=true;$("thanks").hidden=false;scrollTo({top:0});
+  }catch(err){
+    console.error(err);
+    $("msg").textContent="No pudimos enviar tu encuesta. Revisa tu conexión e inténtalo de nuevo.";
+    btn.disabled=false;btn.textContent="Enviar encuesta";
+  }
+});
+
+show(0,0);
+</script>
+</body>
+</html>
