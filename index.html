@@ -71,6 +71,7 @@ form{display:flex;flex-direction:column;gap:20px}
 .nps input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
 textarea,input[type=text],input[type=month],select{width:100%;font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.dates{display:grid;grid-template-columns:3fr 2fr;gap:8px}
 textarea{min-height:90px;resize:vertical}
 select{appearance:none;cursor:pointer;padding-right:40px;
   background-image:linear-gradient(45deg,transparent 50%,var(--rose) 50%),linear-gradient(135deg,var(--rose) 50%,transparent 50%);
@@ -133,6 +134,7 @@ const CFG={
 };
 
 /* ===== 2. Contenido de la encuesta (edita aquí, no en el HTML) ===== */
+const MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const ETIQ=["","Muy malo","Malo","Regular","Bueno","Excelente"];
 const ASPECTOS=[
   ["general","Experiencia general"],["sabor","Sabor de los postres"],
@@ -167,7 +169,11 @@ const chip=(k,o,type)=>`<label class="chip"><input type="${type}" name="${k}" va
 const INPUT={
   chips:q=>`<div class="chips">${q.opts.map(o=>chip(q.k,o,"radio")).join("")}</div>`,
   multi:q=>`<div class="chips">${q.opts.map(o=>chip(q.k,o,"checkbox")).join("")}</div>`,
-  month:q=>`<input type="month" name="${q.k}" aria-label="${esc(q.l)}">`,
+  month:q=>{                                   // dos selects: funciona en todos los navegadores (input month no existe en Safari/Firefox)
+    const y=new Date().getFullYear();
+    return `<div class="dates"><select name="${q.k}_mes" aria-label="Mes"><option value="">Mes</option>${MESES.map((m,i)=>`<option value="${String(i+1).padStart(2,"0")}">${m}</option>`).join("")}</select>
+    <select name="${q.k}_anio" aria-label="Año"><option value="">Año</option>${Array.from({length:11},(_,i)=>`<option>${y-i}</option>`).join("")}</select></div>`;
+  },
   text:q=>`<textarea name="${q.k}" maxlength="1200" placeholder="${esc(q.ph)}" aria-label="${esc(q.l)}"></textarea>`,
   select:q=>`<select name="${q.k}" aria-label="${esc(q.l)}"><option value="">${q.ph}</option>${q.opts.map(o=>`<option>${esc(o)}</option>`).join("")}</select>
     <input type="text" name="${q.k}_otro" maxlength="120" placeholder="Escribe cuál" aria-label="Otro postre favorito" hidden>`,
@@ -225,7 +231,7 @@ form.addEventListener("click",e=>{
 function buildRow(){
   const d=data(), v=k=>(d.get(k)||"").trim()||null;
   const row={
-    evento:d.get("evento"), fecha_evento:d.get("fecha")?d.get("fecha")+"-01":null,
+    evento:d.get("evento"), fecha_evento:d.get("fecha_mes")&&d.get("fecha_anio")?`${d.get("fecha_anio")}-${d.get("fecha_mes")}-01`:null,
     nps:+d.get("nps"), volveria:d.get("volveria"),
     favorito:v("favorito"), favorito_otro:v("favorito_otro"), comentario:v("comentario"),
     canales:d.getAll("canales"), aviso_version:CFG.aviso
